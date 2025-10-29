@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Thư mục gốc của dự án — chỉnh nếu bạn đổi tên folder
+    RewriteBase /myci3/
+
+    # Nếu file hoặc thư mục tồn tại thì không rewrite
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Chuyển tất cả request về index.php
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+# Tắt directory listing
+Options -Indexes
