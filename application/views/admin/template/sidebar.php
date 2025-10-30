@@ -76,7 +76,7 @@
 
                 <!-- Tool SEO -->
                 <div data-kt-menu-trigger="click" 
-                      class="menu-item menu-accordion <?= in_array($this->uri->segment(1), ['seo', 'seo_setting']) ? 'show' : '' ?>">
+                      class="menu-item menu-accordion <?= in_array($this->uri->segment(1), ['seo', 'seo_setting','manualindexcheck']) ? 'show' : '' ?>">
                     <span class="menu-link">
                         <span class="menu-icon"><i class="ki-outline ki-search-list fs-2"></i></span>
                         <span class="menu-title">Tool SEO</span>
@@ -97,8 +97,15 @@
                                 <span class="menu-title">Cấu hình API</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a class="menu-link <?= ($this->uri->segment(1) == 'manualindexcheck') ? 'active' : '' ?>" 
+                            href="<?= site_url('manualindexcheck') ?>">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Check Index thủ công</span>
+                            </a>
+                        </div>
                     </div>
-                </div>xx
+                </div>
 
             </div>
         </div>

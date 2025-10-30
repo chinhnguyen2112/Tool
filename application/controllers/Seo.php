@@ -57,7 +57,7 @@ class Seo extends CI_Controller {
             return false;
         }
 
-        $query = 'site:' . $url;
+        $query = 'info:' . $url;
         $apiUrl = "https://www.googleapis.com/customsearch/v1";
 
         $params = [
