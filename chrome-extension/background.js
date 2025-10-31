@@ -95,40 +95,53 @@ chrome.runtime.onInstalled.addListener(ensureOffscreenDocument);
 
 // reinject sau CAPTCHA hoặc redirect
 chrome.webNavigation.onCompleted.addListener((details) => {
-  if (details.url.includes("https://www.google.com/search")) {
-    const q = (new URL(details.url).searchParams.get('q') || '').replace(/^site:/, '');
-    if (!q) return;
+  if (!details.url.includes("https://www.google.com/search")) return;
 
-    chrome.scripting.executeScript({
-      target: { tabId: details.tabId },
-      func: (originalUrl) => {
-        function detectStatus() {
-          const text = document.body.innerText.toLowerCase();
-          if (text.includes("did not match any documents") || text.includes("không tìm thấy site:")) return "Chưa index";
-          if (text.includes("unusual traffic") || text.includes("bị chặn")) return "Bị chặn bởi Google";
-          return "Đã index";
+  chrome.scripting.executeScript({
+    target: { tabId: details.tabId },
+    func: () => {
+      function detectStatus() {
+        const text = document.body.innerText.toLowerCase();
+        if (text.includes("did not match any documents") || text.includes("không tìm thấy site:"))
+          return "Chưa index";
+        if (text.includes("unusual traffic") || text.includes("bị chặn"))
+          return "Bị chặn bởi Google";
+        return "Đã index";
+      }
+
+      function checkReadyAndClose() {
+        const text = document.body.innerText.toLowerCase();
+        const hasCaptcha = text.includes("unusual traffic") || text.includes("bị chặn");
+        const hasSearchResult = document.querySelector("#search");
+
+        if (!hasCaptcha && hasSearchResult) {
+          const q = new URL(window.location.href).searchParams.get('q') || '';
+          const originalUrl = q.replace(/^site:/, '');
+          const status = detectStatus();
+
+          chrome.runtime.sendMessage({
+            type: "index_result",
+            url: "https://" + originalUrl,
+            status
+          });
+
+          console.log("[AutoClose] CAPTCHA xong, gửi yêu cầu đóng tab...");
+          chrome.runtime.sendMessage({ type: "close_tab" }); // Gửi về background
         }
+      }
 
-        function checkReady() {
-          const body = document.body.innerText.toLowerCase();
-          const hasCaptcha = body.includes("unusual traffic") || body.includes("bị chặn");
-          const hasSearchResult = document.querySelector("#search");
-          if (!hasCaptcha && hasSearchResult) {
-            const status = detectStatus();
-            chrome.runtime.sendMessage({ type: "index_result", url: "https://" + originalUrl, status });
-            setTimeout(() => window.close(), 1500);
-            return true;
-          }
-          return false;
-        }
+      const observer = new MutationObserver(() => checkReadyAndClose());
+      observer.observe(document.body, { childList: true, subtree: true });
+      checkReadyAndClose();
+    }
+  });
+});
 
-        const observer = new MutationObserver(() => {
-          if (checkReady()) observer.disconnect();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-        checkReady();
-      },
-      args: [q]
-    });
+// Xử lý đóng tab ở background
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (msg.type === "close_tab" && sender.tab?.id) {
+    chrome.tabs.remove(sender.tab.id);
   }
 });
+
+

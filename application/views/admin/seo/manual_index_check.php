@@ -134,19 +134,6 @@
                             updateStats();
                         }
 
-                        // function openNextUrl() {
-                        //     const pending = uniqueKeys.filter(k => !processed.has(k));
-                        //     if (pending.length === 0) {
-                        //         spinner.classList.add('d-none');
-                        //         showRetryButton();
-                        //         return;
-                        //     }
-
-                        //     currentKey = pending[0];
-                        //     const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent('site:' + currentKey);
-                        //     spinner.classList.remove('d-none');
-                        //     window.open(searchUrl, '_blank');
-                        // }
                         function openNextUrl() {
                             const pending = uniqueKeys.filter(k => !processed.has(k));
                             if (pending.length === 0) {
