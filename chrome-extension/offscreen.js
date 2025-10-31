@@ -1,8 +1,6 @@
-// offscreen.js - Xử lý việc fetch và parse Google search
 (function() {
   console.log('[Offscreen] Document initialized');
 
-  // Lắng nghe message từ background
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === "fetch_google" && msg.target === "offscreen") {
       console.log('[Offscreen] Received request for:', msg.url);
@@ -14,9 +12,6 @@
     const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent('site:' + fullUrl);
     console.log('[Offscreen] Fetching:', searchUrl);
 
-    let attempts = 0;
-    const maxAttempts = 30;
-
     try {
       const response = await fetch(searchUrl, {
         headers: {
@@ -25,53 +20,33 @@
       });
 
       if (!response.ok) {
+        if (response.status === 429) {
+          console.warn('[Offscreen] 429 detected, sending message show_captcha_tab');
+          chrome.runtime.sendMessage({
+            type: "show_captcha_tab",
+            url: searchUrl,
+            originalUrl: fullUrl
+          });
+          return;
+        }
         throw new Error(`HTTP ${response.status}`);
       }
 
       const html = await response.text();
-      
-      // Parse HTML bằng DOMParser
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
-      // Đợi nội dung load (giống logic content.js)
-      const checkBody = () => {
-        return new Promise((resolve) => {
-          const interval = setInterval(() => {
-            attempts++;
-            const body = doc.body;
-            
-            if (!body || body.innerText.length < 100) {
-              if (attempts >= maxAttempts) {
-                clearInterval(interval);
-                resolve("Timeout");
-              }
-              return;
-            }
-            
-            clearInterval(interval);
-            
-            // Kiểm tra status (logic giống content.js)
-            const text = body.innerText.toLowerCase();
-            let status = "Không xác định";
-            
-            if (text.includes("chúng tôi phát hiện lưu lượng bất thường") || text.includes("unusual traffic")) {
-              status = "Bị chặn bởi Google";
-            } else if (text.includes("không tìm thấy site:") || text.includes("did not match any documents")) {
-              status = "Chưa index";
-            } else {
-              status = "Đã index";
-            }
-            
-            resolve(status);
-          }, 500);
-        });
-      };
 
-      const status = await checkBody();
-      console.log('[Offscreen] Status:', status);
+      const text = doc.body?.innerText.toLowerCase() || "";
+      let status = "Không xác định";
 
-      // Gửi kết quả về background
+      if (text.includes("chúng tôi phát hiện lưu lượng bất thường") || text.includes("unusual traffic")) {
+        status = "Bị chặn bởi Google";
+      } else if (text.includes("không tìm thấy site:") || text.includes("did not match any documents")) {
+        status = "Chưa index";
+      } else {
+        status = "Đã index";
+      }
+
       chrome.runtime.sendMessage({
         type: "index_result",
         url: "https://" + fullUrl,
@@ -80,7 +55,6 @@
 
     } catch (error) {
       console.error('[Offscreen] Error:', error);
-      
       chrome.runtime.sendMessage({
         type: "index_result",
         url: "https://" + fullUrl,
@@ -88,4 +62,5 @@
       });
     }
   }
+
 })();
