@@ -10,7 +10,7 @@ class Seo extends CI_Controller {
         $this->load->library('session');
         $this->load->model('Seo_model');
 
-        if (!$this->session->userdata('user')) {
+        if (!$this->session->userdata('logged_in')) {
             redirect('home');
         }
     }

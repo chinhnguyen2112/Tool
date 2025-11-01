@@ -8,16 +8,18 @@ class Admin extends CI_Controller {
         $this->load->library('session');
         $this->load->model('User_model');
 
-        if (!$this->session->userdata('user')) {
-            redirect('home');
+        // if (!$this->session->userdata('logged_in')) {
+        //     redirect('home');
+        // }
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login'); // ĐÚNG: về auth/login
         }
     }
-
     public function admin_dashboard() {
-        $user = $this->session->userdata('user');
+        // $user = $this->session->userdata('user');
+        $user = $this->session->userdata('logged_in');
         $data['username'] = $user['username'];
         $data['title'] = 'Dashboard';
-
         $this->load->view('admin/template/header', $data);
         $this->load->view('admin/template/sidebar');
         $this->load->view('admin/admin_dashboard');

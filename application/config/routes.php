@@ -50,12 +50,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 // $route['default_controller'] = 'welcome';
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 
-$route['default_controller'] = 'home';
-$route['home'] = 'home';
+$route['default_controller'] = 'Home/index';
+$route['home'] = 'Home/index';
+$route['admin'] = 'Admin/index';
 
 $route['seo/export_excel'] = 'seo/export_excel';
 
@@ -65,4 +67,17 @@ $route['seo_setting'] = 'seo_setting';
 
 $route['manualindexcheck'] = 'ManualIndexCheck';
 
+// AUTH – CHỈ DÙNG auth/*
+$route['auth']              = 'auth';
+$route['auth/login']        = 'auth/login';
+$route['auth/do_login']     = 'auth/do_login';
+$route['auth/register']     = 'auth/register';
+$route['auth/do_register']  = 'auth/do_register';
+$route['auth/logout']       = 'auth/logout';
 
+// ADMIN
+$route['admin'] = 'admin/admin_dashboard';
+$route['admin/users']           = 'admin/users';
+$route['admin/users/add']       = 'admin/add_user';
+$route['admin/users/edit/(:num)'] = 'admin/edit_user/$1';
+$route['admin/users/delete/(:num)'] = 'admin/delete_user/$1';

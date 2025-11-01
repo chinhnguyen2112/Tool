@@ -105,6 +105,14 @@
                             </a>
                         </div>
                     </div>
+                    <div class="menu-item">
+                        <a class="menu-link" href="<?= site_url('admin/logout') ?>">
+                            <span class="menu-icon">
+                                <i class="ki-outline ki-exit-left fs-2"></i>
+                            </span>
+                            <span class="menu-title">Đăng xuất</span>
+                        </a>
+                    </div>
                 </div>
 
             </div>
