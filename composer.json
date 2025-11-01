@@ -12,7 +12,6 @@
 	},
 	"require": {
 		"php": ">=5.3.7",
-		"phpoffice/phpspreadsheet": "^1.28",
 		"guzzlehttp/guzzle": "^6.5"
 	},
 	"suggest": {

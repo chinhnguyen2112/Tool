@@ -90,7 +90,42 @@ class Seo extends CI_Controller {
         return !empty($data['items']);
     }
 
-    public function export_excel() {
+    // public function export_excel() {
+    //     $this->load->library('session');
+
+    //     $urls = $this->input->post('urls');
+    //     $status = $this->input->post('status');
+
+    //     if (empty($urls) || empty($status) || count($urls) != count($status)) {
+    //         show_error('Không có dữ liệu để xuất Excel.');
+    //     }
+    //     require 'vendor/autoload.php';
+
+    //     $spreadsheet = new Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
+    //     $sheet->setTitle('Check Index');
+    //     $sheet->setCellValue('A1', 'URL');
+    //     $sheet->setCellValue('B1', 'Trạng thái');
+
+    //     $row = 2;
+    //     for ($i = 0; $i < count($urls); $i++) {
+    //         $sheet->setCellValue('A' . $row, $urls[$i]);
+    //         $sheet->setCellValue('B' . $row, $status[$i]);
+    //         $row++;
+    //     }
+
+    //     $filename = 'check_index_' . date('Ymd_His') . '.xlsx';
+
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment;filename="'. $filename .'"');
+    //     header('Cache-Control: max-age=0');
+
+    //     $writer = new Xlsx($spreadsheet);
+    //     $writer->save('php://output');
+    //     exit;
+    // }
+    public function export_excel()
+    {
         $this->load->library('session');
 
         $urls = $this->input->post('urls');
@@ -99,29 +134,29 @@ class Seo extends CI_Controller {
         if (empty($urls) || empty($status) || count($urls) != count($status)) {
             show_error('Không có dữ liệu để xuất Excel.');
         }
-        require 'vendor/autoload.php';
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Check Index');
-        $sheet->setCellValue('A1', 'URL');
-        $sheet->setCellValue('B1', 'Trạng thái');
+        // Thiết lập header xuất file Excel
+        header("Content-Type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=check_index_" . date('Ymd_His') . ".xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
 
-        $row = 2;
-        for ($i = 0; $i < count($urls); $i++) {
-            $sheet->setCellValue('A' . $row, $urls[$i]);
-            $sheet->setCellValue('B' . $row, $status[$i]);
-            $row++;
+        echo '<table border="1" cellspacing="0" cellpadding="5">';
+        echo '<tr style="background:#f2f2f2;">';
+        echo '<th><strong>STT</strong></th>';
+        echo '<th><strong>URL</strong></th>';
+        echo '<th><strong>Trạng thái</strong></th>';
+        echo '</tr>';
+
+        foreach ($urls as $key => $url) {
+            echo '<tr>';
+            echo '<td>' . ($key + 1) . '</td>';
+            echo '<td><a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($url) . '</a></td>';
+            echo '<td>' . htmlspecialchars($status[$key]) . '</td>';
+            echo '</tr>';
         }
 
-        $filename = 'check_index_' . date('Ymd_His') . '.xlsx';
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'. $filename .'"');
-        header('Cache-Control: max-age=0');
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
+        echo '</table>';
         exit;
     }
 }

@@ -66,6 +66,7 @@ $route['seo_setting/delete/(:num)'] = 'seo_setting/delete/$1';
 $route['seo_setting'] = 'seo_setting';
 
 $route['manualindexcheck'] = 'ManualIndexCheck';
+$route['manualindexcheck/export_excel'] = 'manualindexcheck/export_excel';
 
 // AUTH – CHỈ DÙNG auth/*
 $route['auth']              = 'auth';

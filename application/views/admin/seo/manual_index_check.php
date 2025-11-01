@@ -83,6 +83,15 @@
                             <button id="retryFailed" class="btn btn-sm btn-light-danger d-none">
                                 Thử lại các URL thất bại
                             </button>
+                            <form method="post" action="<?= site_url('manualindexcheck/export_excel') ?>" id="exportForm" class="d-inline-block">
+                                <?php foreach ($urls as $item): ?>
+                                    <input type="hidden" name="urls[]" value="<?= htmlspecialchars($item['original']) ?>">
+                                <?php endforeach; ?>
+                                <input type="hidden" name="status_data" id="statusData">
+                                <button type="submit" class="btn btn-sm btn-light-success ms-2">
+                                    <i class="ki-outline ki-file-excel fs-4"></i> Xuất Excel
+                                </button>
+                            </form>
                         </div>
                     </div>
 
@@ -185,6 +194,30 @@
                             }
                         }
                     });
+                    </script>
+                    <script>
+                        const exportForm = document.getElementById('exportForm');
+                        if (exportForm) {
+                            exportForm.addEventListener('submit', function (e) {
+                                // Thu thập tất cả URL và trạng thái hiện tại trong bảng
+                                const data = [];
+                                document.querySelectorAll('#resultTable tbody tr').forEach(tr => {
+                                    const url = tr.getAttribute('data-url') || '';
+                                    const badge = tr.querySelector('.status .badge');
+                                    const status = badge ? badge.innerText.trim() : '';
+                                    data.push({ url, status });
+                                });
+
+                                // Gán dữ liệu vào hidden input
+                                document.getElementById('statusData').value = JSON.stringify(data);
+
+                                // Nếu không có dòng nào thì cảnh báo
+                                if (data.length === 0) {
+                                    e.preventDefault();
+                                    alert('Không có dữ liệu để xuất Excel.');
+                                }
+                            });
+                        }
                     </script>
                     <?php endif; ?>
                 </div>

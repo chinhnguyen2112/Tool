@@ -17,7 +17,7 @@
                             <img src="<?= base_url('assets/media/illustrations/sigma-1/20.png') ?>" 
                                  class="mw-100 mh-300px" alt="Welcome">
                         </div>
-
+                        
                         <!-- Text -->
                         <h1 class="fw-bold text-dark mb-3">
                             Xin chào, <span class="text-primary"><?= $username ?></span>!
